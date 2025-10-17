@@ -1,25 +1,58 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { supabase } from '../lib/supabaseClient'
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/router";
 
-export default function Dashboard(){
-  const [builds, setBuilds] = useState([])
-  useEffect(()=>{
-    const fetch = async ()=>{
-      const user = (await supabase.auth.getUser()).data.user
-      if (!user) return
-      const { data } = await supabase.from('builds').select('*').eq('owner', user.id).order('updated_at', {ascending:false})
-      setBuilds(data || [])
+export default function Dashboard() {
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Get current user session
+    async function getUser() {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        router.push("/auth/login"); // redirect if not logged in
+      } else {
+        setUser(user);
+      }
     }
-    fetch()
-  },[])
+    getUser();
+  }, [router]);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/auth/login");
+  }
+
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading your dashboard...</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Your Builds</h1>
-      <Link href="/builds/new"><a className="px-3 py-1 bg-[#FF7849] rounded inline-block mt-3 text-black">Create New Build</a></Link>
-      <ul className="mt-4 space-y-2">
-        {builds.map(b=> (<li key={b.id}><Link href={`/builds/${b.slug||b.id}`}><a className="text-lg">{b.title} — {b.visibility}</a></Link></li>))}
-      </ul>
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
+      <h1 className="text-3xl font-bold mb-6">Welcome, {user.user_metadata?.full_name || user.email}</h1>
+      {user.user_metadata?.avatar_url && (
+        <img
+          src={user.user_metadata.avatar_url}
+          alt="User avatar"
+          className="rounded-full w-24 h-24 mb-6"
+        />
+      )}
+      <p className="mb-6">Email: {user.email}</p>
+      <button
+        onClick={handleLogout}
+        className="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-lg"
+      >
+        Logout
+      </button>
     </div>
-  )
+  );
 }
