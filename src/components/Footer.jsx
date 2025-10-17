@@ -1,0 +1,1 @@
+export default function Footer(){ return (<footer className="mt-12 py-6 text-sm text-gray-400"><div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between"><div>© MetaForge — Community-driven Once Human hub</div><div className="mt-2 md:mt-0">MetaForge: Once Human Build Hub</div></div></footer>) }

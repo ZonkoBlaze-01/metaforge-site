@@ -1,0 +1,2 @@
+import MiniCalculator from '../components/MiniCalculator'
+export default function Calculator(){ return (<div className="rounded p-6 bg-white/3"><h1 className="text-2xl font-bold">Damage Calculator</h1><p className="text-sm text-gray-400 mt-2">Full calculator to test skill multipliers, crit, and enemy defense.</p><div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6"><MiniCalculator/></div></div>) }
